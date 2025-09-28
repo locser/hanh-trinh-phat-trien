@@ -1,0 +1,51 @@
+syntax = "proto3";
+option java_multiple_files = true;
+
+package vn.techres.microservice.grpc.nodejs_ttl_auth;
+
+service AuthService {
+  rpc AuthenticateToken (AuthenticateTokenRequest) returns (AuthenticateTokenResponse);
+  rpc AuthenticateStudentToken (AuthenticateTokenRequest) returns (AuthenticateTokenResponse);
+  rpc AuthenticateCustomerToken (AuthenticateTokenRequest) returns (AuthenticateTokenResponse);
+  rpc AuthenticateWebhookToken (AuthenticateWebhookTokenRequest) returns (EmptyDataResponse);
+  rpc DeleteTokenByCompany (DeleteTokenByCompanyRequest) returns (EmptyDataResponse);
+}
+
+message Empty {}
+
+message EmptyDataResponse {
+  int32 status = 1;
+  string message = 2;
+  Empty data = 3;
+}
+
+message DeleteTokenByCompanyRequest {
+  int32 company_id = 1;
+}
+
+message AuthenticateWebhookTokenRequest {
+  string access_token = 1;
+}
+
+message AuthenticateTokenRequest {
+  string access_token = 1;
+}
+
+message AuthenticateTokenResponse {
+  message AuthenticateTokenDataResponse {
+    string identifier_name = 1;
+    int32 company_id = 2;
+    repeated int32 branch_ids = 3;
+    int32 user_id = 4;
+    string phone = 5;
+    int32 privilege_group_id = 6;
+    repeated string privilege_codes = 7;
+    string user_name = 8;
+    int32 source_type = 9;
+  }
+
+  int32 status = 1;
+  string message = 2;
+  AuthenticateTokenDataResponse data = 3;
+}
+
