@@ -5,11 +5,11 @@ config();
 
 export const AppDataSource = new DataSource({
 	type: 'mariadb',
-	host: process.env.CONFIG_MYSQL_HOST_COURSE,
-	port: parseInt(process.env.CONFIG_MYSQL_PORT_COURSE as string),
-	username: process.env.CONFIG_MYSQL_USERNAME_COURSE,
-	password: process.env.CONFIG_MYSQL_PASSWORD_COURSE,
-	database: process.env.CONFIG_MYSQL_DB_NAME_COURSE,
+	host: process.env.CONFIG_MYSQL_HOST,
+	port: parseInt(process.env.CONFIG_MYSQL_PORT as string),
+	username: process.env.CONFIG_MYSQL_USERNAME,
+	password: process.env.CONFIG_MYSQL_PASSWORD,
+	database: process.env.CONFIG_MYSQL_DB_NAME,
 	entities: ['src/database/entities/*.entity.ts'],
 	migrations: ['src/database/migrations/*.ts'],
 	migrationsTableName: 'migrations',

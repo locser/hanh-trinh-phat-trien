@@ -4,14 +4,15 @@ dotenv.config();
 
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { webcrypto } from 'crypto';
-import { json, raw, urlencoded } from 'express';
+import { json, urlencoded } from 'express';
 import * as fs from 'fs';
 import * as moment from 'moment-timezone';
 import { AppModule } from './app.module';
-import { grpcServerOptions } from './grpc/server/grpc-server.options';
+import { IpDetectionMiddleware } from './common/middleware/ip-detection.middleware';
+import { UserIdentificationMiddleware } from './common/middleware/user-identification.middleware';
+// import { grpcServerOptions } from './grpc/server/grpc-server.options';
 
 export const TIME_ZONE = 'Asia/Ho_Chi_Minh';
 process.env.TZ = TIME_ZONE;
@@ -30,6 +31,8 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		rawBody: true,
 	});
+
+	app.getHttpAdapter().getInstance().set('trust proxy', true);
 
 	if (!globalThis.crypto) {
 		globalThis.crypto = webcrypto as Crypto;
@@ -66,6 +69,19 @@ async function bootstrap() {
 		}),
 	);
 
+	const ipDetection = new IpDetectionMiddleware();
+	app.use(ipDetection.use.bind(ipDetection));
+
+	const userIdentification = new UserIdentificationMiddleware();
+	app.use(userIdentification.use.bind(userIdentification));
+
+	// logger info request ip and user session
+	app.use((req, res, next) => {
+		console.log(`Request IP: ${req.ip}`);
+		console.log(`Request User Session: ${req['userSession']}`);
+		next();
+	});
+
 	const config = new DocumentBuilder()
 		.addBearerAuth()
 		.setTitle(`${SERVICE_NAME} Service ${process.env.CONFIG_BUILD_TIME}`)
@@ -84,7 +100,7 @@ async function bootstrap() {
 		},
 	});
 
-	app.connectMicroservice<MicroserviceOptions>(grpcServerOptions);
+	// app.connectMicroservice<MicroserviceOptions>(grpcServerOptions);
 	await app.startAllMicroservices();
 
 	await app.listen(process.env.SERVICE_PORT);

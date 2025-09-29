@@ -3,7 +3,7 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { AuthGuard } from './common/guards/auth.guard';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { JwtConfigModule } from './config/jwt/jwt-config.module';
 import { TypeOrmConfigService } from './config/typeorm.config';
@@ -47,7 +47,7 @@ import { V1Module } from './v1/v1.module';
 		},
 		{
 			provide: APP_GUARD,
-			useClass: AuthGuard,
+			useClass: JwtAuthGuard,
 		},
 	],
 })

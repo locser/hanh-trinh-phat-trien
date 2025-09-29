@@ -5,11 +5,11 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
 	createTypeOrmOptions(): TypeOrmModuleOptions {
 		return {
 			type: 'mariadb',
-			host: process.env.CONFIG_MYSQL_HOST_COURSE,
-			port: parseInt(process.env.CONFIG_MYSQL_PORT_COURSE),
-			username: process.env.CONFIG_MYSQL_USERNAME_COURSE,
-			password: process.env.CONFIG_MYSQL_PASSWORD_COURSE,
-			database: process.env.CONFIG_MYSQL_DB_NAME_COURSE,
+			host: process.env.CONFIG_MYSQL_HOST,
+			port: parseInt(process.env.CONFIG_MYSQL_PORT),
+			username: process.env.CONFIG_MYSQL_USERNAME,
+			password: process.env.CONFIG_MYSQL_PASSWORD,
+			database: process.env.CONFIG_MYSQL_DB_NAME,
 			entities: [__dirname + '/../**/*.entity{.ts,.js}'],
 			timezone: '+07:00',
 			dateStrings: true,
