@@ -32,11 +32,21 @@ export class FormSubmissionEntity extends BaseEntity {
 		type: Object,
 		description: 'Dữ liệu form đầy đủ dạng JSON',
 		example: {
-			personal_info: { full_name: 'Nguyễn Văn A', age: 25, occupation: 'Developer', education_level: 'Đại học' },
-			current_situation: { current_soft_skills: ['JavaScript'], knowledge_level: 7, experience_level: 'Trung cấp' },
-			goals: { priority_areas: ['technical-skills'], short_term_goals: 'Học TypeScript', time_available_a_day: 2 },
-			preferences: { learning_style: 'hands-on', budget: 5000000, deadline_month: 6 },
-			additional: { additional_notes: 'Ghi chú' },
+			personal_info: { full_name: 'Nguyễn Văn A', phone: '0123456789', email: 'nguyenvana@email.com' },
+			work_fields: ['IT', 'Marketing'],
+			work_description: 'Phát triển web application',
+			years_of_experience: '3 năm',
+			skills: [
+				{ skill: 'JavaScript', level: 'Trung bình' },
+				{ skill: 'React', level: 'Khá' },
+				{ skill: 'Node.js', level: 'Giỏi' },
+			],
+			unemployment_duration: '6 tháng',
+			ai_impact: 'Có',
+			ai_impact_description: 'AI đã thay thế một số công việc lập trình cơ bản',
+			career_goal: 'Trở thành Senior Full-stack Developer',
+			timeline: '2 năm',
+			needs: ['Học lập trình', 'Phát triển kỹ năng mềm'],
 		},
 	})
 	@Column({ type: 'json' })

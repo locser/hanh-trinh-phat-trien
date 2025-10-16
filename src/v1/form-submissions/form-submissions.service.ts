@@ -23,9 +23,11 @@ export class FormSubmissionsService {
 		await this.checkRateLimit(clientIp);
 
 		// Extract basic fields for indexing (theo DTO structure mới của bạn)
-		const age = createFormSubmissionDto.personal_info.age;
-		const occupation = createFormSubmissionDto.personal_info.occupation;
-		const educationLevel = createFormSubmissionDto.personal_info.education_level;
+		// Note: New DTO structure doesn't have age, occupation, education_level in personal_info
+		// These fields will be set to default values or extracted from other parts if needed
+		const age = 0; // Default value since not in new structure
+		const occupation = createFormSubmissionDto.work_description || 'N/A'; // Use work description as occupation
+		const educationLevel = 'N/A'; // Default value since not in new structure
 
 		// Get current daily submission count for this IP
 		const dailyCount = await this.getDailySubmissionCount(clientIp);

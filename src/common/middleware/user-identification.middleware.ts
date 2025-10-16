@@ -4,6 +4,18 @@ import { NextFunction, Request, Response } from 'express';
 @Injectable()
 export class UserIdentificationMiddleware implements NestMiddleware {
 	use(req: Request, res: Response, next: NextFunction) {
+		// Skip middleware for public routes, root API, Swagger docs, and auth endpoints
+		if (
+			req.path.startsWith('/api/public') ||
+			req.path === '/api' ||
+			req.path === '/api/' ||
+			req.path.startsWith('/api/docs') ||
+			req.path.startsWith('/api/v1/auth')
+		) {
+			next();
+			return;
+		}
+
 		// Check for required header: X-User-Session
 		const userSession = req.headers['x-user-session'] as string;
 

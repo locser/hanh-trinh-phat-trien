@@ -56,6 +56,7 @@ async function bootstrap() {
 	app.use(urlencoded({ limit: '5mb', extended: true }));
 
 	const PREFIX = 'api';
+	const SWAGGER_PREFIX = 'api/docs';
 	const SERVICE_NAME = process.env.npm_package_name.toUpperCase();
 
 	app.enableCors({
@@ -77,8 +78,8 @@ async function bootstrap() {
 
 	// logger info request ip and user session
 	app.use((req, res, next) => {
-		console.log(`Request IP: ${req.ip}`);
-		console.log(`Request User Session: ${req['userSession']}`);
+		// console.log(`Request IP: ${req.ip}`);
+		// console.log(`Request User Session: ${req['userSession']}`);
 		next();
 	});
 
@@ -90,7 +91,7 @@ async function bootstrap() {
 		.build();
 
 	const document = SwaggerModule.createDocument(app, config);
-	SwaggerModule.setup(PREFIX, app, document, {
+	SwaggerModule.setup(SWAGGER_PREFIX, app, document, {
 		customSiteTitle: `${SERVICE_NAME} Service`,
 		customCss: '.swagger-ui .topbar { display: none }',
 		swaggerOptions: {

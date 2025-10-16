@@ -1,173 +1,51 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
+import { IsArray, IsNotEmpty, IsObject, IsString, ValidateNested } from 'class-validator';
 
 // Personal Info sub-DTO
 class PersonalInfoDto {
 	@ApiProperty({
 		description: 'Họ tên đầy đủ',
 		example: 'Nguyễn Văn A',
-		required: false,
-	})
-	@IsOptional()
-	@IsString()
-	full_name?: string;
-
-	@ApiProperty({
-		description: 'Tuổi',
-		example: 25,
-	})
-	@IsNumber()
-	age: number;
-
-	@ApiProperty({
-		description: 'Nghề nghiệp hiện tại',
-		example: 'Software Developer',
 	})
 	@IsString()
 	@IsNotEmpty()
-	occupation: string;
+	full_name: string;
 
 	@ApiProperty({
-		description: 'Trình độ học vấn',
-		example: 'Đại học',
+		description: 'Số điện thoại',
+		example: '0123456789',
 	})
 	@IsString()
 	@IsNotEmpty()
-	education_level: string;
+	phone: string;
 
 	@ApiProperty({
-		description: 'Số năm kinh nghiệm làm việc',
-		example: 3,
-		required: false,
+		description: 'Email',
+		example: 'nguyenvana@email.com',
 	})
-	@IsOptional()
-	@IsNumber()
-	@Min(0)
-	work_experience?: number;
+	@IsString()
+	@IsNotEmpty()
+	email: string;
 }
 
-// Current Situation sub-DTO
-class CurrentSituationDto {
+// Individual Skill DTO
+class SkillDto {
 	@ApiProperty({
-		description: 'Các kỹ năng hiện tại',
-		example: ['Giao tiếp', 'Làm việc nhóm', 'Lãnh đạo', 'Quản lý thời gian'],
-		type: [String],
-	})
-	@IsArray()
-	@IsString({ each: true })
-	current_soft_skills: string[];
-
-	// kiến thức hiện tại của bạn Mới bắt đầu -> Chuyên gia (1-10)
-	@ApiProperty({
-		description: 'Kiến thức hiện tại của bạn Mới bắt đầu -> Chuyên gia (1-10)',
-		example: 7,
-		minimum: 1,
-		maximum: 10,
-	})
-	@IsNumber()
-	@Min(1)
-	@Max(10)
-	knowledge_level: number;
-
-	// kinh nghiệm thực tế
-	@ApiProperty({
-		description: 'Mô tả kinh nghiệm thực tế',
-		example: 'Kinh nghiệm thực tế: 2 năm phát triển web vị trí backend developer',
-	})
-	@IsString()
-	experience_level: string;
-}
-
-// Goals sub-DTO
-class GoalsDto {
-	@ApiProperty({
-		description: 'Các lĩnh vực ưu tiên',
-		example: ['technical-skills', 'leadership', 'business'],
-		type: [String],
-	})
-	@IsArray()
-	@IsString({ each: true })
-	priority_areas: string[];
-
-	@ApiProperty({
-		description: 'Mục tiêu ngắn hạn (6 tháng)',
-		example: 'Học TypeScript và Next.js',
+		description: 'Tên kỹ năng',
+		example: 'JavaScript',
 	})
 	@IsString()
 	@IsNotEmpty()
-	short_term_goals: string;
+	skill: string;
 
 	@ApiProperty({
-		description: 'Mục tiêu trung hạn (1-2 năm)',
-		example: 'Trở thành Senior Developer',
+		description: 'Trình độ kỹ năng',
+		example: 'Trung bình',
 	})
 	@IsString()
 	@IsNotEmpty()
-	medium_term_goals: string;
-
-	@ApiProperty({
-		description: 'Mục tiêu dài hạn (3-5 năm)',
-		example: 'Khởi nghiệp công ty tech',
-	})
-	@IsString()
-	@IsNotEmpty()
-	long_term_goals: string;
-
-	// thời gian dành ra mỗi ngày (giờ)
-	@ApiProperty({
-		description: 'Thời gian dành ra mỗi ngày (giờ)',
-		example: 10,
-		minimum: 1,
-		maximum: 40,
-	})
-	@IsNumber()
-	time_available_a_day: number;
-}
-
-// Preferences sub-DTO
-class PreferencesDto {
-	@ApiProperty({
-		description: 'Phong cách học tập ưa thích',
-		example: 'hands-on',
-		enum: ['visual', 'auditory', 'kinesthetic', 'hands-on'],
-	})
-	@IsString()
-	@IsNotEmpty()
-	learning_style: string;
-
-	@ApiProperty({
-		description: 'Ngân sách có thể chi (VND)',
-		example: 5000000,
-		required: false,
-	})
-	@IsOptional()
-	@IsNumber()
-	@Min(0)
-	budget?: number;
-
-	// Deadline Mong Muốn tháng (số tháng hoặc linh hoạt)
-	@ApiProperty({
-		description: 'Deadline Mong Muốn tháng (số tháng hoặc linh hoạt)',
-		example: 3,
-		minimum: 1,
-		maximum: 12,
-	})
-	@IsNumber()
-	@Type(() => Number)
-	deadline_month: number;
-}
-
-// Additional sub-DTO
-class AdditionalDto {
-	@ApiProperty({
-		description: 'Ghi chú thêm',
-		example: 'Muốn tập trung vào full-stack development',
-		required: false,
-	})
-	@IsOptional()
-	@IsString()
-	additional_notes?: string;
+	level: string;
 }
 
 // Main DTO
@@ -182,40 +60,90 @@ export class CreateFormSubmissionDto {
 	personal_info: PersonalInfoDto;
 
 	@ApiProperty({
-		description: 'Tình trạng hiện tại',
-		type: CurrentSituationDto,
+		description: 'Lĩnh vực công việc',
+		example: ['IT', 'Marketing', 'Sales'],
+		type: [String],
 	})
-	@IsObject()
-	@ValidateNested()
-	@Type(() => CurrentSituationDto)
-	current_situation: CurrentSituationDto;
+	@IsArray()
+	@IsString({ each: true })
+	work_fields: string[];
 
 	@ApiProperty({
-		description: 'Mục tiêu phát triển',
-		type: GoalsDto,
+		description: 'Mô tả công việc',
+		example: 'Phát triển web application sử dụng React và Node.js',
 	})
-	@IsObject()
-	@ValidateNested()
-	@Type(() => GoalsDto)
-	goals: GoalsDto;
+	@IsString()
+	@IsNotEmpty()
+	work_description: string;
 
 	@ApiProperty({
-		description: 'Sở thích học tập',
-		type: PreferencesDto,
+		description: 'Số năm kinh nghiệm làm việc',
+		example: '3 năm',
 	})
-	@IsObject()
-	@ValidateNested()
-	@Type(() => PreferencesDto)
-	preferences: PreferencesDto;
+	@IsString()
+	@IsNotEmpty()
+	years_of_experience: string;
 
 	@ApiProperty({
-		description: 'Thông tin bổ sung',
-		type: AdditionalDto,
-		required: false,
+		description: 'Kỹ năng hiện có',
+		type: [SkillDto],
+		example: [
+			{ skill: 'JavaScript', level: 'Trung bình' },
+			{ skill: 'React', level: 'Khá' },
+			{ skill: 'Node.js', level: 'Giỏi' },
+		],
 	})
-	@IsOptional()
-	@IsObject()
-	@ValidateNested()
-	@Type(() => AdditionalDto)
-	additional?: AdditionalDto;
+	@IsArray()
+	@ValidateNested({ each: true })
+	@Type(() => SkillDto)
+	skills: SkillDto[];
+
+	@ApiProperty({
+		description: 'Thời gian thất nghiệp',
+		example: '6 tháng',
+	})
+	@IsString()
+	@IsNotEmpty()
+	unemployment_duration: string;
+
+	@ApiProperty({
+		description: 'Tác động của AI',
+		example: 'Có',
+	})
+	@IsString()
+	@IsNotEmpty()
+	ai_impact: string;
+
+	@ApiProperty({
+		description: 'Mô tả cụ thể tác động của AI',
+		example: 'AI đã thay thế một số công việc lập trình cơ bản',
+	})
+	@IsString()
+	@IsNotEmpty()
+	ai_impact_description: string;
+
+	@ApiProperty({
+		description: 'Mục tiêu sự nghiệp',
+		example: 'Trở thành Senior Full-stack Developer',
+	})
+	@IsString()
+	@IsNotEmpty()
+	career_goal: string;
+
+	@ApiProperty({
+		description: 'Thời gian mong muốn đạt được mục tiêu',
+		example: '2 năm',
+	})
+	@IsString()
+	@IsNotEmpty()
+	timeline: string;
+
+	@ApiProperty({
+		description: 'Nhu cầu hỗ trợ',
+		example: ['Học lập trình', 'Phát triển kỹ năng mềm', 'Tìm việc làm'],
+		type: [String],
+	})
+	@IsArray()
+	@IsString({ each: true })
+	needs: string[];
 }
