@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { CreateFormSubmissionDto } from '../../v1/form-submissions/dto/create-form-submission.dto';
 
 @Entity('form_submissions')
@@ -27,6 +27,15 @@ export class FormSubmissionEntity extends BaseEntity {
 	})
 	@Column({ type: 'text', nullable: true })
 	user_agent: string;
+
+	@ApiProperty({
+		type: String,
+		description: 'Mã công khai 6 ký tự (A-Z0-9) để người dùng tra cứu',
+		example: '9F2KQ7',
+	})
+	@Index({ unique: true })
+	@Column({ type: 'char', length: 6, unique: true })
+	public_code: string;
 
 	@ApiProperty({
 		type: Object,
@@ -113,11 +122,20 @@ export class FormSubmissionEntity extends BaseEntity {
 	@Column({ type: 'int', default: 1 })
 	daily_submission_count: number;
 
+	@ApiProperty({
+		description: 'ID chuyên viên được giao xử lý submission này',
+		example: 12,
+	})
+	@Index('idx_form_submission_assigned_expert')
+	@Column({ type: 'int', nullable: true })
+	assigned_expert_id?: number | null;
+
 	constructor(init?: Partial<FormSubmissionEntity>) {
 		super();
 		this.id = +init?.id || 0;
 		this.ip_address = init?.ip_address || '';
 		this.user_agent = init?.user_agent || '';
+		this.public_code = init?.public_code || '';
 		this.data = init?.data || ({} as CreateFormSubmissionDto);
 		this.submitted_at = init?.submitted_at || new Date();
 		this.age = +init?.age || 0;
@@ -126,5 +144,6 @@ export class FormSubmissionEntity extends BaseEntity {
 		this.ai_processing_status = init?.ai_processing_status || 'pending';
 		this.error_message = init?.error_message || '';
 		this.daily_submission_count = +init?.daily_submission_count || 1;
+		this.assigned_expert_id = init?.assigned_expert_id ?? null;
 	}
 }

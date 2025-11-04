@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import crypto from 'crypto';
 import { Between, Repository } from 'typeorm';
 import { FormSubmissionEntity } from '../../database/entities/form-submission.entity';
 import { RateLimiterUtil } from '../../utils/rate-limiter.util';
@@ -32,6 +33,9 @@ export class FormSubmissionsService {
 		// Get current daily submission count for this IP
 		const dailyCount = await this.getDailySubmissionCount(clientIp);
 
+		// Generate unique public code
+		const publicCode = await this.generateUniquePublicCode();
+
 		// Create form submission entity
 		const formSubmission = this.formSubmissionRepository.create({
 			ip_address: clientIp,
@@ -42,6 +46,7 @@ export class FormSubmissionsService {
 			education_level: educationLevel,
 			ai_processing_status: 'pending',
 			daily_submission_count: dailyCount + 1,
+			public_code: publicCode,
 		});
 
 		// Save to database
@@ -51,6 +56,55 @@ export class FormSubmissionsService {
 		// await this.triggerTimelineGeneration(savedSubmission.id);
 
 		return new FormSubmissionCreateResponse(savedSubmission);
+	}
+
+	async listSubmissions(page = 1, limit = 20): Promise<FormSubmissionEntity[]> {
+		const offset = (page - 1) * limit;
+		return this.formSubmissionRepository.find({ skip: offset, take: limit, order: { submitted_at: 'DESC' } });
+	}
+
+	async listAssignedSubmissions(expertId: number, page = 1, limit = 20): Promise<FormSubmissionEntity[]> {
+		const offset = (page - 1) * limit;
+		return this.formSubmissionRepository.find({
+			where: { assigned_expert_id: expertId },
+			skip: offset,
+			take: limit,
+			order: { submitted_at: 'DESC' },
+		});
+	}
+
+	async assignSubmission(submissionId: number, expertId: number): Promise<void> {
+		await this.formSubmissionRepository.update({ id: submissionId }, { assigned_expert_id: expertId });
+	}
+
+	private async generateUniquePublicCode(): Promise<string> {
+		const MAX_RETRIES = 5;
+		for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+			const code = this.generatePublicCode();
+			const exists = await this.formSubmissionRepository.exist({ where: { public_code: code } });
+			if (!exists) return code;
+		}
+		// Fallback with timestamp-based suffix (still uppercase A-Z0-9)
+		return this.generatePublicCode();
+	}
+
+	private generatePublicCode(): string {
+		const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		const bytes = crypto.randomBytes(6);
+		let code = '';
+		for (let i = 0; i < 6; i++) {
+			code += alphabet[bytes[i] % alphabet.length];
+		}
+		return code;
+	}
+
+	async getByPublicCode(code: string): Promise<FormSubmissionEntity | null> {
+		const normalized = code.trim().toUpperCase();
+		const submission = await this.formSubmissionRepository.findOne({ where: { public_code: normalized } });
+		if (!submission) {
+			throw new HttpException('Submission not found', HttpStatus.BAD_REQUEST);
+		}
+		return submission;
 	}
 
 	private async checkRateLimit(ip: string): Promise<void> {
